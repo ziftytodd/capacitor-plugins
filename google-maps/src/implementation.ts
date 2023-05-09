@@ -149,6 +149,11 @@ export interface EnableClusteringArgs {
   id: string;
   minClusterSize?: number;
 }
+export interface FitBoundsArgs {
+  id: string;
+  points: { lat: number, lng: number }[];
+}
+
 
 export interface CapacitorGoogleMapsPlugin extends Plugin {
   create(options: CreateMapArgs): Promise<void>;
@@ -180,6 +185,7 @@ export interface CapacitorGoogleMapsPlugin extends Plugin {
     args: MapBoundsContainsArgs,
   ): Promise<{ contains: boolean }>;
   mapBoundsExtend(args: MapBoundsExtendArgs): Promise<{ bounds: LatLngBounds }>;
+  fitBounds(args: FitBoundsArgs): Promise<void>;
 }
 
 const CapacitorGoogleMaps = registerPlugin<CapacitorGoogleMapsPlugin>(

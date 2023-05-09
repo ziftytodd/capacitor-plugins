@@ -18,6 +18,7 @@ import com.google.maps.android.clustering.Cluster
 import com.google.maps.android.clustering.ClusterManager
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
+import org.json.JSONObject
 import java.io.InputStream
 import java.net.URL
 
@@ -45,7 +46,7 @@ class CapacitorGoogleMap(
     private val markers = HashMap<String, CapacitorGoogleMapMarker>()
     private val polygons = HashMap<String, CapacitorGoogleMapsPolygon>()
     private val circles = HashMap<String, CapacitorGoogleMapsCircle>()
-    private val polylines = HashMap<String, CapacitorGoogleMapPolyline>()        
+    private val polylines = HashMap<String, CapacitorGoogleMapPolyline>()
     private val markerIcons = HashMap<String, Bitmap>()
     private var clusterManager: ClusterManager<CapacitorGoogleMapMarker>? = null
 
@@ -301,7 +302,7 @@ class CapacitorGoogleMap(
                     }
                     val googleMapPolyline = googleMap?.addPolyline(polylineOptions.await())
                     googleMapPolyline?.tag = it.tag
-                    
+
                     it.googleMapsPolyline = googleMapPolyline
 
                     polylines[googleMapPolyline!!.id] = it
@@ -494,6 +495,27 @@ class CapacitorGoogleMap(
                         polylines.remove(it)
                     }
                 }
+
+                callback(null)
+            }
+        } catch (e: GoogleMapsError) {
+            callback(e)
+        }
+    }
+
+    fun fitBounds(points: List<JSONObject>, callback: (error: GoogleMapsError?) -> Unit) {
+        try {
+            googleMap ?: throw GoogleMapNotAvailable()
+            val markerIds: MutableList<String> = mutableListOf()
+
+            CoroutineScope(Dispatchers.Main).launch {
+                val boundsBuilder = LatLngBounds.builder()
+                points.forEach {
+                    boundsBuilder.include(LatLng(it.getDouble("lat"), it.getDouble("lng")))
+                }
+                val bounds = boundsBuilder.build()
+
+                googleMap?.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 50))
 
                 callback(null)
             }
@@ -725,7 +747,7 @@ class CapacitorGoogleMap(
 
         return polygonOptions
     }
-    
+
     private fun buildPolyline(line: CapacitorGoogleMapPolyline): PolylineOptions {
         val polylineOptions = PolylineOptions()
         polylineOptions.width(line.strokeWidth * this.config.devicePixelRatio)

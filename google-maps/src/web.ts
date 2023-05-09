@@ -34,7 +34,7 @@ import type {
   AddCirclesArgs,
   RemoveCirclesArgs,
   AddPolylinesArgs,
-  RemovePolylinesArgs,
+  RemovePolylinesArgs, FitBoundsArgs,
 } from './implementation';
 
 export class CapacitorGoogleMapsWeb
@@ -458,6 +458,12 @@ export class CapacitorGoogleMapsWeb
       },
     });
     return { bounds: result };
+  }
+
+  async fitBounds(_args: FitBoundsArgs): Promise<void> {
+    const bounds = new google.maps.LatLngBounds();
+    _args.points.forEach(pt => { bounds.extend(pt) });
+    this.maps[_args.id].map.fitBounds(bounds);
   }
 
   private getLatLngBounds(_args: LatLngBounds): google.maps.LatLngBounds {

@@ -748,6 +748,45 @@ public class CapacitorGoogleMapsPlugin: CAPPlugin, GMSMapViewDelegate {
         }
     }
 
+    @objc func fitBounds(_ call: CAPPluginCall) {
+        do {
+            guard let id = call.getString("id") else {
+                throw GoogleMapErrors.invalidMapId
+            }
+
+            guard let pointObjs = call.getArray("points") as? [JSObject] else {
+                throw GoogleMapErrors.invalidArguments("points array is missing")
+            }
+
+            if pointObjs.isEmpty {
+                throw GoogleMapErrors.invalidArguments("fitFounds requires at least one point")
+            }
+
+            guard let map = self.maps[id] else {
+                throw GoogleMapErrors.mapNotFound
+            }
+
+
+            var bounds = GMSCoordinateBounds()
+            try pointObjs.forEach { pointObj in
+                guard let lat = pointObj["lat"] as? Double, let lng = pointObj["lng"] as? Double else {
+                    throw GoogleMapErrors.invalidArguments("LatLng object is missing the required 'lat' and/or 'lng' property")
+                }
+                bounds = bounds.includingCoordinate(CLLocationCoordinate2D(latitude: lat, longitude: lng))
+            }
+
+            let update = GMSCameraUpdate.fit(bounds, withPadding: 50.0)
+            
+            DispatchQueue.main.sync {
+                map.mapViewController.GMapView.moveCamera(update)
+            }
+
+            call.resolve([:])
+        } catch {
+            handleError(call, error: error)
+        }
+    }
+
     @objc func mapBoundsExtend(_ call: CAPPluginCall) {
         do {
             guard let boundsObject = call.getObject("bounds") else {

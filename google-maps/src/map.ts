@@ -106,6 +106,7 @@ export interface GoogleMapInterface {
   setOnMyLocationClickListener(
     callback?: MapListenerCallback<MapClickCallbackData>,
   ): Promise<void>;
+  fitBounds(points: { lat: number, lng: number }[]): Promise<void>;
 }
 
 class MapCustomElement extends HTMLElement {
@@ -388,6 +389,13 @@ export class GoogleMap {
     return CapacitorGoogleMaps.setCamera({
       id: this.id,
       config,
+    });
+  }
+
+  async fitBounds(points: { lat: number, lng: number }[]): Promise<void> {
+    return CapacitorGoogleMaps.fitBounds({
+      id: this.id,
+      points
     });
   }
 

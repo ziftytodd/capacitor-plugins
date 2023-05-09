@@ -313,6 +313,7 @@ export default MyMap;
 * [`setOnMarkerDragEndListener(...)`](#setonmarkerdragendlistener)
 * [`setOnMyLocationButtonClickListener(...)`](#setonmylocationbuttonclicklistener)
 * [`setOnMyLocationClickListener(...)`](#setonmylocationclicklistener)
+* [`fitBounds(...)`](#fitbounds)
 * [Interfaces](#interfaces)
 * [Type Aliases](#type-aliases)
 * [Enums](#enums)
@@ -817,6 +818,19 @@ setOnMyLocationClickListener(callback?: MapListenerCallback<MapClickCallbackData
 | Param          | Type                                                                                                                                |
 | -------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
 | **`callback`** | <code><a href="#maplistenercallback">MapListenerCallback</a>&lt;<a href="#mapclickcallbackdata">MapClickCallbackData</a>&gt;</code> |
+
+--------------------
+
+
+### fitBounds(...)
+
+```typescript
+fitBounds(points: { lat: number; lng: number; }[]) => Promise<void>
+```
+
+| Param        | Type                                         |
+| ------------ | -------------------------------------------- |
+| **`points`** | <code>{ lat: number; lng: number; }[]</code> |
 
 --------------------
 

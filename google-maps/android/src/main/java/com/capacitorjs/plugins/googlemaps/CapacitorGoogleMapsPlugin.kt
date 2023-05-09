@@ -619,6 +619,42 @@ class CapacitorGoogleMapsPlugin : Plugin() {
     }
 
     @PluginMethod
+    fun fitBounds(call: PluginCall) {
+        try {
+            val id = call.getString("id")
+            id ?: throw InvalidMapIdError()
+
+            val map = maps[id]
+            map ?: throw MapNotFoundError()
+
+            val pointsObjectArray = call.getArray("points", null)
+            pointsObjectArray ?: throw InvalidArgumentsError("points array is missing")
+
+            if (pointsObjectArray.length() == 0) {
+                throw InvalidArgumentsError("markers array requires at least one marker")
+            }
+
+            val points: MutableList<JSONObject> = mutableListOf()
+
+            for (i in 0 until pointsObjectArray.length()) {
+                points.add(pointsObjectArray.getJSONObject(i))
+            }
+
+            map.fitBounds(points) { err ->
+                if (err != null) {
+                    throw err
+                }
+
+                call.resolve()
+            }
+        } catch (e: GoogleMapsError) {
+            handleError(call, e)
+        } catch (e: Exception) {
+            handleError(call, e)
+        }
+    }
+
+    @PluginMethod
     fun getMapType(call: PluginCall) {
         try {
             val id = call.getString("id")
